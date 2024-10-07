@@ -23,8 +23,8 @@ pipeline {
 				sh 'mvn clean test'
                 echo 'Junit Test case check Completed!'
 			}
-		}/*
-        stage('Sonarqube') {
+		}
+        stage('Sonarqube code quality') {
             environment {
                 scannerHome = tool 'SonarQubeScanner'
 			}
@@ -37,7 +37,7 @@ pipeline {
                     waitForQualityGate abort Pipeline: true
 			    }
 			}
-		}*/
+		}
         stage ('Code Package') {
             steps {
                 echo 'creating jar artifact!'
@@ -61,20 +61,20 @@ pipeline {
             }
         }
         stage ( Docker push to Docker Hub') {
-           steps {
-              script {
+            steps {
+               script {
                  withCredentials ([string (credentialsId: 'dockerhubCred', variable: 'dockerhubCred')]) {
                  sh 'docker login docker.io -u deeputech -p $(dockerhubCred}'
                  echo "Push Docker Image to DockerHub: In Progress"
                  sh 'docker push deeputech/mmt-ms: latest'
                  echo "Push Docker Image to DockerHub: In Progress"
                  }
-              }
-           }
+               }
+            }
         }
-        stage(' Docker Image Push to Amazon ECR') {
-           steps {
-              script {
+        stage (' Docker Image Push to Amazon ECR') {
+            steps {
+               script {
                  withDockerRegistry([credentialsId: 'ecr: ap-south-1: ecr-credentials', url:"https://484635853186.dkr.ecr.ap-south-1.amazonaws.com/mmt-ms"]){
                  sh """
                  echo "List the docker images present in local"
@@ -87,8 +87,8 @@ pipeline {
                  echo "Push Docker Image to ECR Completed"
                  """
                  }
-              }
-           }
+               }
+            }
         }
 
     }
